@@ -1,6 +1,6 @@
 # InterviewTask
 
-# InterviewTask - .NET Book API
+
 
 ## Overview
 This project is a simple ASP.NET Core REST API to manage books. Authors are stored as a hardcoded list and are not linked to the database.

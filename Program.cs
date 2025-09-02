@@ -1,5 +1,6 @@
 using InterviewTask.Data;
 using InterviewTask.Repositories;
+using InterviewTask.Service;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IBookService, BookService>();
 
 
 builder.Services.AddEndpointsApiExplorer();

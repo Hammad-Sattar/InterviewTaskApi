@@ -1,16 +1,13 @@
 ﻿using InterviewTask.Models;
-using InterviewTask.Repositories;
+using InterviewTask.Service;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace InterviewTask.Controllers
     {
     [ApiController]
     [Route("api/[controller]")]
     public class BooksController : ControllerBase
         {
-        private readonly IBookRepository _repo;
+        private readonly IBookService _service;
 
         // Hardcoded authors list
         private readonly List<Author> authors = new List<Author>
@@ -21,22 +18,22 @@ namespace InterviewTask.Controllers
             new Author { Id = 4, Name = "Robert C. Martin" }
         };
 
-        public BooksController(IBookRepository repo)
+        public BooksController(IBookService service)
             {
-            _repo = repo;
+            _service = service;
             }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
             {
-            var books = await _repo.GetAllAsync();
+            var books = await _service.GetAllAsync();
             return Ok(books);
             }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
             {
-            var book = await _repo.GetByIdAsync(id);
+            var book = await _service.GetByIdAsync(id);
             return book == null ? NotFound($"Book with ID {id} not found.") : Ok(book);
             }
 
@@ -46,7 +43,7 @@ namespace InterviewTask.Controllers
             if (book == null || string.IsNullOrWhiteSpace(book.Title))
                 return BadRequest("Book or Title cannot be empty.");
 
-            var createdBook = await _repo.AddAsync(book);
+            var createdBook = await _service.AddAsync(book);
             return CreatedAtAction(nameof(GetById), new { id = createdBook.Id }, createdBook);
             }
 
@@ -56,18 +53,18 @@ namespace InterviewTask.Controllers
             if (book == null || id != book.Id)
                 return BadRequest("Book is null or ID mismatch.");
 
-            var existing = await _repo.GetByIdAsync(id);
+            var existing = await _service.GetByIdAsync(id);
             if (existing == null)
                 return NotFound($"Book with ID {id} not found.");
 
-            var updated = await _repo.UpdateAsync(book);
+            var updated = await _service.UpdateAsync(book);
             return Ok(updated);
             }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
             {
-            var success = await _repo.DeleteAsync(id);
+            var success = await _service.DeleteAsync(id);
             return success ? NoContent() : NotFound($"Book with ID {id} not found.");
             }
 
@@ -77,7 +74,7 @@ namespace InterviewTask.Controllers
             if (string.IsNullOrWhiteSpace(title))
                 return BadRequest("Title query is required.");
 
-            var books = await _repo.SearchByTitleAsync(title);
+            var books = await _service.SearchByTitleAsync(title);
             return books.Count == 0 ? NotFound("No books found matching the title.") : Ok(books);
             }
 
